@@ -465,7 +465,7 @@ module EtOrbi
       sn = off < 0 ? '-' : '+'; off = off.abs
       hr = off / 3600
       mn = (off % 3600) / 60
-      sc = 0
+      sc = off % 60
 
       if @zone.name == 'UTC'
         'Z' # align on Ruby ::Time#iso8601

@@ -28,7 +28,9 @@ module EtOrbi
     #
     def get_offset_tzone(str)
 
-      m = str.match(/\A([+-][0-1]?[0-9]):?([0-5][0-9])?\z/) rescue nil
+      m = str.match(
+        /\A([+-])([0-1]?[0-9])(?::?([0-5][0-9]))?(?::?([0-5][0-9]))?\z/
+      ) rescue nil
         #
         # On Windows, the real encoding could be something other than UTF-8,
         # and make the match fail
@@ -38,16 +40,18 @@ module EtOrbi
       tz = custom_tzs[str]
       return tz if tz
 
-      hr = m[1].to_i
-      mn = m[2].to_i
+      hr = m[2].to_i
+      mn = m[3].to_i
+      sc = m[4].to_i
 
-      hr = nil if hr.abs > 11
-      hr = nil if mn > 59
-      mn = -mn if m[1].start_with?('-')
+      hr = nil if hr > 14 || (hr == 14 && (mn > 0 || sc > 0))
 
-      hr ?
-        custom_tzs[str] = create_offset_tzone(hr * 3600 + mn * 60, str) :
-        nil
+      return nil unless hr
+
+      off = hr * 3600 + mn * 60 + sc
+      off = -off if m[1] == '-'
+
+      custom_tzs[str] = create_offset_tzone(off, str)
     end
 
     if defined?(TZInfo::DataSources::ConstantOffsetDataTimezoneInfo)
@@ -129,4 +133,3 @@ module EtOrbi
     end
   end
 end
-

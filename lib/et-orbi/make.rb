@@ -50,7 +50,8 @@ module EtOrbi
 
     def make_time(*a)
 
-      zone = a.length > 1 ? get_tzone(a.last) : nil
+      zone =
+        a.length > 1 && !a.last.is_a?(Numeric) ? get_tzone(a.last) : nil
       a.pop if zone
 
       o = a.length > 1 ? a : a.first

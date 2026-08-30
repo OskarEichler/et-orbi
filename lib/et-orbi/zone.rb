@@ -94,13 +94,14 @@ module EtOrbi
 
     def get_tzinfo_tzone(name)
 
-      #return ::TZInfo::Timezone.get(name) rescue nil
+      return ::TZInfo::Timezone.get(name) if ZONES_OLSON.include?(name)
 
-      loop do
-        return ::TZInfo::Timezone.get(name) if ZONES_OLSON.include?(name)
-        name = name[0..-2]
-        return nil if name.empty?
-      end
+      m = name.match(
+        /\A([A-Z]{3,4})[+-]?(\d{1,2})(?::?([0-5]\d))?(?:[A-Z]{3,4})?\z/
+      ) rescue nil
+      base = m && m[1] if m && m[2].to_i <= 24
+
+      ::TZInfo::Timezone.get(base) if base && ZONES_OLSON.include?(base)
     end
 
     def windows_zone_code_x(zone_name)

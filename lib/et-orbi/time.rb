@@ -519,14 +519,18 @@ module EtOrbi
 
     def rweek_ref=(x)
 
-      @rweek_ref =
+      ref =
         case x
         when /^[21]\d{3}-(1[012]|0?\d)-(3[01]|[21]\d|0?\d)$/ then x
         when :saturday                then '2019-01-05'
         when :sunday, :us             then '2018-12-30'
         when :monday, :default, :iso  then RWEEK_REF_DEFAULT
-        else fail(ArgumentError.new("not a valid rweek_ref #{x.inspect}"))
         end
+
+      fail ArgumentError.new("not a valid rweek_ref #{x.inspect}") \
+        unless ref && ::Date.valid_date?(*ref.split('-').map(&:to_i))
+
+      @rweek_ref = ref.dup.freeze
     end
 
     def rweek_ref

@@ -500,13 +500,6 @@ module EtOrbi
       o.to_f
     end
 
-    # Gives back the Eotime instance pointing to the reference day
-    # used to compute #rweek and #rday
-    #
-    def rref
-
-      ::Date.parse(::EtOrbi.rweek_ref)
-    end
   end
 end
 
@@ -539,3 +532,4 @@ module EtOrbi
     end
   end
 end
+

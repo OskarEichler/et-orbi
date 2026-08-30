@@ -38,8 +38,12 @@ module EtOrbi
 
       zone =
         opts[:zone] ||
-        get_tzone(str_zone) ||
-        determine_local_tzone
+        get_tzone(str_zone)
+
+      fail ArgumentError.new("Cannot determine timezone from #{str_zone.inspect}") \
+        if str_zone && !zone
+
+      zone ||= determine_local_tzone
 
       #local = Time.parse(str)
       #secs = zone.local_to_utc(local).to_f
@@ -130,4 +134,3 @@ module EtOrbi
     end
   end
 end
-

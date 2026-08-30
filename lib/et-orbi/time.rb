@@ -188,6 +188,11 @@ module EtOrbi
 
     alias to_t to_local_time
 
+    def to_date
+
+      ::Date.new(year, month, day)
+    end
+
     def is_dst?
 
       @zone.period_for_utc(utc).std_offset != 0
@@ -364,9 +369,7 @@ module EtOrbi
     #
     def rday
 
-      @rday ||= (
-        (EtOrbi.make_time(strftime('%F 12:00:00'), @zone) - rref) / DAY_S
-          ).floor
+      @rday ||= (self.to_date - rref).to_i
     end
 
     # "reference week", used in fugit for cron modulo notation
@@ -483,7 +486,7 @@ module EtOrbi
     #
     def rref
 
-      EtOrbi.make_time("#{::EtOrbi.rweek_ref} 12:00:00", @zone)
+      ::Date.parse(::EtOrbi.rweek_ref)
     end
   end
 end
@@ -513,4 +516,3 @@ module EtOrbi
     end
   end
 end
-

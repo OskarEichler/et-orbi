@@ -97,6 +97,7 @@ module EtOrbi
 
       @time = nil
       @rday = nil
+      @rday_ref = nil
     end
 
     def seconds=(f)
@@ -366,7 +367,12 @@ module EtOrbi
     #
     def rday
 
-      @rday ||= (self.to_date - rref).to_i
+      ref = ::EtOrbi.rweek_ref
+      @rday = (self.to_date - ::Date.parse(ref)).to_i \
+        if @rday_ref != ref
+      @rday_ref = ref
+
+      @rday
     end
 
     # "reference week", used in fugit for cron modulo notation
@@ -478,14 +484,6 @@ module EtOrbi
       o.to_f
     end
 
-    # Gives back the Eotime instance pointing to the reference day
-    # used to compute #rweek and #rday
-    #
-    def rref
-
-      #::Date.new(*::EtOrbi.rweek_ref.split('-').map(&:to_i))
-      ::Date.parse(::EtOrbi.rweek_ref)
-    end
   end
 end
 
@@ -498,14 +496,18 @@ module EtOrbi
 
     def rweek_ref=(x)
 
-      @rweek_ref =
+      ref =
         case x
         when /^[21]\d{3}-(1[012]|0?\d)-(3[01]|[21]\d|0?\d)$/ then x
         when :saturday                then '2019-01-05'
         when :sunday, :us             then '2018-12-30'
         when :monday, :default, :iso  then RWEEK_REF_DEFAULT
-        else fail(ArgumentError.new("not a valid rweek_ref #{x.inspect}"))
         end
+
+      fail ArgumentError.new("not a valid rweek_ref #{x.inspect}") \
+        unless ref && ::Date.valid_date?(*ref.split('-').map(&:to_i))
+
+      @rweek_ref = ref.dup.freeze
     end
 
     def rweek_ref

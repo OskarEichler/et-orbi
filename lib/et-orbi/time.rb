@@ -97,6 +97,7 @@ module EtOrbi
 
       @time = nil
       @rday = nil
+      @rday_ref = nil
     end
 
     def seconds=(f)
@@ -369,7 +370,12 @@ module EtOrbi
     #
     def rday
 
-      @rday ||= (self.to_date - rref).to_i
+      ref = ::EtOrbi.rweek_ref
+      @rday = (self.to_date - ::Date.parse(ref)).to_i \
+        if @rday_ref != ref
+      @rday_ref = ref
+
+      @rday
     end
 
     # "reference week", used in fugit for cron modulo notation

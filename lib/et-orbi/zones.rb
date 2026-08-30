@@ -31,17 +31,14 @@ module EtOrbi
           .flatten
           .sort_by(&:size)
           .reverse
+    ZONES_OLSON_REX = Regexp.union(ZONES_OLSON)
 
     def extract_zone(str)
 
       s = str.dup
 
-      zs = ZONES_OLSON
-        .inject([]) { |a, z|
-          i = s.index(z); next a unless i
-          a << z
-          s[i, z.length] = ''
-          a }
+      zs = []
+      s.gsub!(ZONES_OLSON_REX) { |m| zs << m; '' }
 
       s.gsub!(ZONES_ISO8601_REX) { |m| zs << m.strip; '' } #if zs.empty?
 
@@ -343,4 +340,3 @@ module EtOrbi
     'US Mountain Standard Time' => 'America/Phoenix'
   }
 end
-

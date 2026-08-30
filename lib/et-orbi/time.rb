@@ -393,6 +393,19 @@ module EtOrbi
       fail ArgumentError.new("missing :second, :minute, and :hour") \
         unless s || m || h
 
+      invalid =
+        [ [ :second, s, 0..59 ],
+          [ :minute, m, 0..59 ],
+          [ :hour, h, 0..23 ] ]
+            .find { |_, v, range|
+              v &&
+              (!v.is_a?(Numeric) || !v.real? || !v.finite? ||
+                v != v.to_i || !range.cover?(v)) }
+
+      fail ArgumentError.new(
+        "invalid :#{invalid[0]} #{invalid[1].inspect}"
+      ) if invalid
+
       if !s && !m
         step = 60 * 60
         t -= t.sec
